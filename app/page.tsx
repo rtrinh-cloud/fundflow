@@ -64,8 +64,8 @@ const showToast = (msg: string) => { setToastMsg(msg); setTimeout(() => setToast
     })();
   }, []);
 
-  const saveCompanies = async (list) => { setCompanies(list); await store.set("ff:companies", list); };
-  const saveInvestors = async (list) => { setInvestors(list); await store.set("ff:investors", list); };
+  const saveCompanies = async (list: any[]) => { setCompanies(list); await store.set("ff:companies", list); };
+  const saveInvestors = async (list: any[]) => { setInvestors(list); await store.set("ff:investors", list); };
 
   const scoreMatches = async (cos, investor) => {
     if (!investor || !cos.length) return;
