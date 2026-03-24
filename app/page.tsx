@@ -1,3 +1,4 @@
+"use client";
 import { useState, useRef, useEffect } from "react";
 
 const VERTICALS = ["SaaS","Fintech","HealthTech","AI/ML","Consumer","EdTech","CleanTech","Marketplace","DeepTech","Other"];
