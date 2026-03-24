@@ -10,13 +10,13 @@ const BORDER = "#2a2a2a";
 
 // Storage helpers
 const store = {
-  async get(key) {
+  async get(key: string) {
     try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch { return null; }
   },
-  async set(key, val) {
+  async set(key: string, val: unknown) {
     try { await window.storage.set(key, JSON.stringify(val)); } catch {}
   },
-  async del(key) {
+  async del(key: string) {
     try { await window.storage.delete(key); } catch {}
   }
 };
