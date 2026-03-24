@@ -1,5 +1,3 @@
-## 8. app/api/auth/investor/route.ts
-```typescript
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
@@ -11,26 +9,6 @@ export async function POST(req: NextRequest) {
     const { data: existing } = await supabaseAdmin
       .from('investors').select('id').eq('email', email).single()
     if (existing) return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
-
     const password_hash = await bcrypt.hash(password, 10)
     const { data, error } = await supabaseAdmin.from('investors').insert({
-      id: `inv-${Date.now()}`, name, firm, email, password_hash, ...rest
-    }).select().single()
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    const { password_hash: _, ...safe } = data
-    return NextResponse.json(safe)
-  }
-
-  if (action === 'login') {
-    const { data, error } = await supabaseAdmin
-      .from('investors').select('*').eq('email', email).single()
-    if (error || !data) return NextResponse.json({ error: 'No account found' }, { status: 404 })
-    const valid = await bcrypt.compare(password, data.password_hash)
-    if (!valid) return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
-    const { password_hash: _, ...safe } = data
-    return NextResponse.json(safe)
-  }
-}
-```
-
----
+      id: `inv-${Date.now()}`, name, firm, email, password_hash
