@@ -1,5 +1,4 @@
-## 3. lib/supabase.ts
-```typescript
+
 import { createClient } from '@supabase/supabase-js'
 
 export const supabase = createClient(
