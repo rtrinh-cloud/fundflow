@@ -38,6 +38,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, message: 'Reset email sent (configure Resend)' })
   }
 }
-
-
----
