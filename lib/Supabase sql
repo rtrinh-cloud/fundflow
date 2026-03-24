@@ -1,0 +1,61 @@
+## 6. Supabase SQL (run in SQL Editor)
+```sql
+-- Drop old tables if needed
+drop table if exists founders;
+drop table if exists investors;
+drop table if exists connections;
+
+-- Founders
+create table founders (
+  id text primary key,
+  founder_name text not null,
+  company text not null,
+  logo_url text,
+  vertical text,
+  stage text,
+  round_amount text,
+  description text,
+  fundraising boolean default true,
+  email text unique not null,
+  password_hash text not null,
+  scheduling_link text,
+  created_at timestamptz default now()
+);
+
+-- Investors
+create table investors (
+  id text primary key,
+  name text not null,
+  firm text,
+  email text unique not null,
+  password_hash text not null,
+  scheduling_link text,
+  focus_verticals text,
+  focus_stages text,
+  created_at timestamptz default now()
+);
+
+-- Connections
+create table connections (
+  id text primary key,
+  investor_name text,
+  investor_firm text,
+  investor_email text,
+  founder_name text,
+  company text,
+  founder_email text,
+  message text,
+  created_at timestamptz default now()
+);
+
+-- Disable RLS for now (enable + add policies before going to production)
+alter table founders disable row level security;
+alter table investors disable row level security;
+alter table connections disable row level security;
+
+grant all on founders to anon, authenticated;
+grant all on investors to anon, authenticated;
+grant all on connections to anon, authenticated;
+```
+
+---
