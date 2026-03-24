@@ -3,35 +3,55 @@ import { supabaseAdmin } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
-  const { action, name, company, email, password, ...rest } = await req.json()
+  const body = await req.json()
+  const action = body.action
+  const email = body.email
+  const password = body.password
 
   if (action === 'signup') {
-    const { data: existing } = await supabaseAdmin
-      .from('founders').select('id').eq('email', email).single()
-    if (existing) return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
-    const password_hash = await bcrypt.hash(password, 10)
-    const { data, error } = await supabaseAdmin.from('founders').insert({
-      id: `co-${Date.now()}`, founder_name: name, company, email, password_hash, ...rest
-    }).select().single()
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    const { password_hash: _, ...safe } = data
-    return NextResponse.json(safe)
+    const check = await supabaseAdmin.from('founders').select('id').eq('email', email).single()
+    if (check.data) {
+      return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
+    }
+    const hash = await bcrypt.hash(password, 10)
+    const row = {
+      id: 'co-' + Date.now(),
+      founder_name: body.name,
+      company: body.company,
+      email: email,
+      password_hash: hash,
+      logo_url: body.logoDataUrl || null,
+      vertical: body.vertical || null,
+      stage: body.stage || null,
+      round_amount: body.roundAmount || null,
+      description: body.description || null,
+      fundraising: body.fundraising || true,
+      scheduling_link: body.schedulingLink || null
+    }
+    const result = await supabaseAdmin.from('founders').insert(row).select().single()
+    if (result.error) {
+      return NextResponse.json({ error: result.error.message }, { status: 500 })
+    }
+    return NextResponse.json(result.data)
   }
 
   if (action === 'login') {
-    const { data, error } = await supabaseAdmin
-      .from('founders').select('*').eq('email', email).single()
-    if (error || !data) return NextResponse.json({ error: 'No account found' }, { status: 404 })
-    const valid = await bcrypt.compare(password, data.password_hash)
-    if (!valid) return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
-    const { password_hash: _, ...safe } = data
-    return NextResponse.json(safe)
+    const result = await supabaseAdmin.from('founders').select('*').eq('email', email).single()
+    if (result.error || !result.data) {
+      return NextResponse.json({ error: 'No account found' }, { status: 404 })
+    }
+    const valid = await bcrypt.compare(password, result.data.password_hash)
+    if (!valid) {
+      return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
+    }
+    return NextResponse.json(result.data)
   }
 
   if (action === 'recover') {
-    const { data } = await supabaseAdmin
-      .from('founders').select('email').eq('email', email).single()
-    if (!data) return NextResponse.json({ error: 'No account found' }, { status: 404 })
+    const result = await supabaseAdmin.from('founders').select('email').eq('email', email).single()
+    if (!result.data) {
+      return NextResponse.json({ error: 'No account found' }, { status: 404 })
+    }
     return NextResponse.json({ success: true })
   }
 
