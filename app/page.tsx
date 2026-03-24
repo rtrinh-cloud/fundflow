@@ -47,8 +47,8 @@ export default function FundFlow() {
   const [founderSubmitting, setFounderSubmitting] = useState(false);
   const logoRef = useRef();
 
-  const showToast = (msg) => { setToastMsg(msg); setTimeout(() => setToastMsg(""), 3500); };
-
+const showToast = (msg: string) => { setToastMsg(msg); setTimeout(() => setToastMsg(""), 3500); };
+  
   useEffect(() => {
     (async () => {
       setLoading(true);
