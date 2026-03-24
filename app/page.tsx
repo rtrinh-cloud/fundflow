@@ -11,13 +11,16 @@ const BORDER = "#2a2a2a";
 // Storage helpers
 const store = {
   async get(key: string) {
-    try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch { return null; }
+    try {
+      const r = await (window as any).storage.get(key);
+      return r ? JSON.parse(r.value) : null;
+    } catch { return null; }
   },
   async set(key: string, val: unknown) {
-    try { await window.storage.set(key, JSON.stringify(val)); } catch {}
+    try { await (window as any).storage.set(key, JSON.stringify(val)); } catch {}
   },
   async del(key: string) {
-    try { await window.storage.delete(key); } catch {}
+    try { await (window as any).storage.delete(key); } catch {}
   }
 };
 
