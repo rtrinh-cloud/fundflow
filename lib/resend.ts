@@ -1,5 +1,3 @@
-## 4. lib/resend.ts
-```typescript
 import { Resend } from 'resend'
 
 export const resend = new Resend(process.env.RESEND_API_KEY)
@@ -24,22 +22,19 @@ export async function sendConnectionRequest({
   schedulingLink?: string
 }) {
   await resend.emails.send({
-    from: 'FundFlow ',
+    from: 'FundFlow <noreply@yourdomain.com>',
     to: founderEmail,
     subject: `${investorFirm || investorName} wants to connect with ${companyName}`,
     html: `
-      
-        You have a new investor connection request 🎉
-        ${investorName} from ${investorFirm || 'an investment firm'} is interested in connecting with ${companyName}.
-        ${message ? `Their message: ${message}` : ''}
-        Investor email: ${investorEmail}
-        ${schedulingLink ? `Schedule a Call` : ''}
-        
-        Sent via FundFlow · Powered by Mercury
-      
+      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+        <h2>You have a new investor connection request 🎉</h2>
+        <p><strong>${investorName}</strong> from <strong>${investorFirm || 'an investment firm'}</strong> is interested in connecting with <strong>${companyName}</strong>.</p>
+        ${message ? `<p><strong>Their message:</strong> ${message}</p>` : ''}
+        <p><strong>Investor email:</strong> <a href="mailto:${investorEmail}">${investorEmail}</a></p>
+        ${schedulingLink ? `<p><a href="${schedulingLink}" style="background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Schedule a Call</a></p>` : ''}
+        <hr/>
+        <p style="color:#888;font-size:12px;">Sent via FundFlow · Powered by Mercury</p>
+      </div>
     `,
   })
 }
-```
-
----
