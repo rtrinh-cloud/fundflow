@@ -1,5 +1,3 @@
-## 5. lib/types.ts
-```typescript
 export type Founder = {
   id: string
   founder_name: string
@@ -37,6 +35,3 @@ export type Connection = {
   message?: string
   created_at: string
 }
-```
-
----
