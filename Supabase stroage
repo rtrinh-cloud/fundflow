@@ -1,0 +1,43 @@
+## 11. Supabase Storage (for logos + pitch decks)
+Run in Supabase SQL Editor:
+```sql
+insert into storage.buckets (id, name, public) values ('logos', 'logos', true);
+insert into storage.buckets (id, name, public) values ('decks', 'decks', false);
+```
+Then in Storage settings, set logos bucket to **public** so images load in the app.
+
+---
+
+## Deploy Steps
+
+### Step 1 — Set up locally
+```bash
+npx create-next-app@latest fundflow --typescript --app --no-tailwind --no-eslint
+cd fundflow
+npm install @supabase/supabase-js resend bcryptjs @types/bcryptjs
+```
+Replace the generated files with the code above.
+
+### Step 2 — Push to GitHub
+```bash
+git init
+git add .
+git commit -m "Initial FundFlow commit"
+gh repo create fundflow --public --push
+```
+
+### Step 3 — Deploy to Vercel
+1. Go to [vercel.com](https://vercel.com) → New Project
+2. Import your GitHub repo
+3. Add environment variables from `.env.local`
+4. Click Deploy → live in ~2 minutes
+
+### Step 4 — Get Resend API key
+1. Sign up at [resend.com](https://resend.com) (free)
+2. Add & verify your sending domain
+3. Paste the API key into Vercel env vars
+
+### Step 5 — Get Supabase service role key
+1. Supabase → Settings → API
+2. Copy **service_role** key (keep this secret — server only)
+3. Add as `SUPABASE_SERVICE_ROLE_KEY` in Vercel
