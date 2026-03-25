@@ -26,8 +26,8 @@ const store = {
 
 export default function FundFlow() {
   const [view, setView] = useState("home");
-  const [companies, setCompanies] = useState([]);
-  const [investors, setInvestors] = useState([]);
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [investors, setInvestors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [investorAccount, setInvestorAccount] = useState(null);
   const [founderAccount, setFounderAccount] = useState(null);
@@ -64,8 +64,8 @@ const showToast = (msg: string) => { setToastMsg(msg); setTimeout(() => setToast
     })();
   }, []);
 
-  const saveCompanies = async (list: never[]) => { setCompanies(list); await store.set("ff:companies", list); };
-  const saveInvestors = async (list: never[]) => { setInvestors(list); await store.set("ff:investors", list); };
+  const saveCompanies = async (list: any[]) => { setCompanies(list); await store.set("ff:companies", list); };
+  const saveInvestors = async (list: any[]) => { setInvestors(list); await store.set("ff:investors", list); };
 
   const scoreMatches = async (cos, investor) => {
     if (!investor || !cos.length) return;
@@ -95,7 +95,7 @@ Return ONLY a JSON array, no markdown. Each item: {"id":"...","score":85,"reason
     if (!authForm.name || !authForm.email || !authForm.password) return setAuthError("Please fill all required fields.");
     if (investors.find(i=>i.email.toLowerCase()===authForm.email.toLowerCase())) return setAuthError("An account with this email already exists.");
     const acc = { id:`inv-${Date.now()}`, ...authForm, createdAt: new Date().toISOString() };
-    const updated = [...investors, acc];
+    const updated = [...investors, acc] as never[];
     await saveInvestors(updated);
     await store.set("ff:session:investor", acc);
     setInvestorAccount(acc);
