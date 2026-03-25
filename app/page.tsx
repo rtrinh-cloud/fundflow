@@ -40,13 +40,15 @@ export default function FundFlow() {
   const [loadingMatch, setLoadingMatch] = useState(false);
   const [authForm, setAuthForm] = useState({ name:"", firm:"", email:"", password:"", schedulingLink:"", focusVerticals:[] as string[], focusStages:[] as string[] });
   const [loginForm, setLoginForm] = useState({ email:"", password:"" });
-  const [founderForm, setFounderForm] = useState({ name:"", company:"", logoDataUrl:"", vertical:"SaaS", stage:"Seed", roundAmount:"", description:"", fundraising:true, email:"", password:"", schedulingLink:"" });
+  const [founderForm, setFounderForm] = useState({ name:"", company:"", logoDataUrl:"", vertical:"SaaS", stage:"Seed", roundAmount:"", description:"", fundraising:true, email:"", password:"", schedulingLink:"", deckUrl:"" });
   const [contactForm, setContactForm] = useState({ message:"" });
   const [authError, setAuthError] = useState("");
   const [founderError, setFounderError] = useState("");
   const [founderSubmitting, setFounderSubmitting] = useState(false);
   const [recoveredPassword, setRecoveredPassword] = useState("");
   const logoRef = useRef<HTMLInputElement>(null);
+  const deckRef = useRef<HTMLInputElement>(null);
+  const [deckUploading, setDeckUploading] = useState(false);
 
   const showToast = (msg: string) => { setToastMsg(msg); setTimeout(() => setToastMsg(""), 3500); };
 
@@ -91,7 +93,25 @@ Return ONLY a JSON array, no markdown. Each item: {"id":"...","score":85,"reason
     setLoadingMatch(false);
   };
 
-  const handleInvestorSignup = async () => {
+  const uploadDeck = async (file: File): Promise<string | null> => {
+    setDeckUploading(true);
+    try {
+      const SUPABASE_URL = "https://bxhoaeqhmleygsueholb.supabase.co";
+      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aG9hZXFobWxleWdzdWVob2xiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODI1NjIsImV4cCI6MjA4OTk1ODU2Mn0.PEMxlSx5Yq-4DfdTgBwwSbdy2GAWQjjfpzVfAaT__YQ";
+      const fileName = `${Date.now()}-${file.name}`;
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/decks/${fileName}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+      if (!res.ok) { console.error("Upload failed", await res.text()); return null; }
+      return `${SUPABASE_URL}/storage/v1/object/decks/${fileName}`;
+    } catch(e) { console.error(e); return null; }
+    finally { setDeckUploading(false); }
+  };
     setAuthError("");
     if (!authForm.name || !authForm.email || !authForm.password) return setAuthError("Please fill all required fields.");
     if (investors.find((i:any)=>i.email.toLowerCase()===authForm.email.toLowerCase())) return setAuthError("An account with this email already exists.");
@@ -152,6 +172,7 @@ Return ONLY a JSON array, no markdown. Each item: {"id":"...","score":85,"reason
       description:founderForm.description, fundraising:founderForm.fundraising,
       founderEmail:founderForm.email, founderName:founderForm.name,
       schedulingLink:founderForm.schedulingLink, password:founderForm.password,
+      deckUrl:founderForm.deckUrl,
       bookmarked:false, matchScore:null, matchReason:"", createdAt:new Date().toISOString()
     };
     const updated = [...companies, co];
@@ -483,7 +504,10 @@ Return ONLY a JSON array, no markdown. Each item: {"id":"...","score":85,"reason
                 <span style={s.tag}>{co.stage}</span>
                 {co.roundAmount&&<span style={s.tagAccent}>{co.roundAmount}</span>}
               </div>
-              <button style={{...s.btn,padding:"10px",fontSize:13}} onClick={()=>setContactModal(co)}>Request to Connect</button>
+              <div style={{display:"flex",gap:8}}>
+                <button style={{...s.btn,flex:1,padding:"10px",fontSize:13}} onClick={()=>setContactModal(co)}>Request to Connect</button>
+                {co.deckUrl && <a href={co.deckUrl} target="_blank" rel="noreferrer" style={{...s.btnOutline,padding:"10px 14px",fontSize:13,textDecoration:"none",display:"flex",alignItems:"center"}}>📄 Deck</a>}
+              </div>
             </div>
           ))}
         </div>
